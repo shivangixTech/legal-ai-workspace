@@ -21,6 +21,12 @@ import os
 import time
 import uuid
 
+# PyMuPDF is imported at module load, NOT inside the request: on slow
+# shared CPUs (Render free tier) the first import alone can take longer
+# than the web server's 30s worker timeout and kill the upload request.
+# Paying the import once at app boot keeps uploads fast.
+import fitz  # PyMuPDF
+
 CHUNK_SIZE = 1000          # characters per chunk (fixed-size, Day-6 lock)
 CHUNK_OVERLAP = 150        # characters of overlap between neighbours
 EMBED_MODEL = "models/gemini-embedding-001"
@@ -133,8 +139,6 @@ def ingest_document(document_id):
                 set_status("indexed")
                 return "indexed"
             existing.delete()  # stale version from a failed run — start fresh
-
-        import fitz  # PyMuPDF
 
         pages = []
         with fitz.open(stream=pdf_bytes, filetype="pdf") as pdf:
