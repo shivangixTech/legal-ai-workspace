@@ -46,7 +46,10 @@ def _tavily_search(query):
                 "max_results": MAX_RESULTS,
                 "search_depth": "basic",
             },
-            timeout=30,
+            # Tight caps (connect 5s, read 20s): a hanging search API
+            # must fail fast as a friendly error, never stall the
+            # request until the web worker is killed (Render free tier).
+            timeout=(5, 20),
         )
     except Exception as exc:
         raise ResearchError(f"Web search failed: {exc}")
@@ -55,8 +58,14 @@ def _tavily_search(query):
             f"Web search returned HTTP {resp.status_code} — check "
             "TAVILY_API_KEY in .env."
         )
+    try:
+        payload = resp.json()
+    except ValueError:
+        raise ResearchError(
+            "Web search returned an unreadable response - please try again."
+        )
     results = []
-    for r in resp.json().get("results", [])[:MAX_RESULTS]:
+    for r in payload.get("results", [])[:MAX_RESULTS]:
         results.append(
             {
                 "title": r.get("title") or r.get("url") or "Untitled",
@@ -98,7 +107,9 @@ def _synthesize(question, sources):
     )
     try:
         model = genai.GenerativeModel(CHAT_MODEL)
-        resp = model.generate_content(prompt)
+        resp = model.generate_content(
+            prompt, request_options={"timeout": 60}
+        )
         report = (resp.text or "").strip()
     except Exception as exc:
         raise ResearchError(f"Report generation failed: {exc}")

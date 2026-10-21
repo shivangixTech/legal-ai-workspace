@@ -455,6 +455,10 @@ def case_research(request, pk):
                 run.status = "failed"
                 run.save(update_fields=["status"])
                 research_error = str(exc)
+            except Exception as exc:  # never let a surprise error 500 the page
+                run.status = "failed"
+                run.save(update_fields=["status"])
+                research_error = f"Research failed: {exc}"
             else:
                 run.report = report
                 run.sources = sources
