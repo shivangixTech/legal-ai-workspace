@@ -1,0 +1,41 @@
+# Legal AI Workspace — pinned-ish requirements (Day 1)
+# Install: pip install -r requirements.txt
+
+# --- Django product shell ---
+django>=5.0,<6.0
+django-allauth>=65.0          # Google OAuth login
+psycopg2-binary>=2.9          # Postgres driver (Supabase)
+
+# --- FastAPI AI service ---
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.0
+httpx>=0.27                   # Django → FastAPI internal calls
+
+# --- Supabase ---
+supabase>=2.0
+
+# --- LLM / RAG ---
+google-generativeai>=0.8      # Gemini chat + embeddings (free tier)
+langchain>=0.3
+langchain-google-genai>=2.0
+langgraph>=0.2                # research agent workflow
+langsmith>=0.2                # tracing / observability
+
+# --- Document ingestion ---
+pymupdf>=1.24                 # PDF parsing (OCR fallback later if needed)
+
+# --- Web search (research agent) ---
+tavily-python>=0.5
+
+# --- Background workers (Phase 2+, optional at first) ---
+celery>=5.4
+redis>=5.0
+
+# --- Utils ---
+requests>=2.0               # allauth google provider ko chahiye
+python-dotenv>=1.0
+
+# --- Production serving (Day 12 - Render) ---
+gunicorn>=22.0                # WSGI server
+whitenoise>=6.0               # static files in production

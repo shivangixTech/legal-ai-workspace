@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}New Case — Legal AI Workspace{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>➕ New Case</h1>
+  <p class="muted">Create a case in your workspace. Documents and chat come in later phases.</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Create case</button>
+    <a href="{% url 'dashboard' %}" class="muted" style="margin-left:12px;">Cancel</a>
+  </form>
+</div>
+<style>
+  form p { margin-bottom: 14px; }
+  form label { display: block; font-weight: 600; margin-bottom: 6px; }
+  form input, form textarea, form select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; font-family: inherit; }
+  form input:focus, form textarea:focus, form select:focus { outline: 2px solid #1e3a5f; border-color: #1e3a5f; }
+  .errorlist { color: #dc2626; list-style: none; margin-bottom: 8px; }
+</style>
+{% endblock %}

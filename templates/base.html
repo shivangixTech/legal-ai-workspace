@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Legal AI Workspace{% endblock %}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f6fb; color: #1e293b; }
+    .nav { background: #1e3a5f; color: #fff; padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
+    .nav a { color: #fff; text-decoration: none; margin-left: 16px; }
+    .brand { font-weight: 700; font-size: 18px; }
+    .wrap { max-width: 900px; margin: 32px auto; padding: 0 20px; }
+    .card { background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 20px; }
+    .btn { display: inline-block; background: #1e3a5f; color: #fff !important; padding: 12px 24px; border-radius: 8px; text-decoration: none; border: none; cursor: pointer; font-size: 15px; }
+    .btn-google { background: #fff; color: #1e293b !important; border: 1px solid #cbd5e1; display: inline-flex; align-items: center; gap: 10px; }
+    h1 { margin-bottom: 12px; } h2 { margin-bottom: 10px; }
+    .muted { color: #64748b; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #e2e8f0; }
+    th { color: #64748b; font-size: 13px; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <span class="brand">⚖️ Legal AI Workspace</span>
+    <div>
+      {% if user.is_authenticated %}
+        <span>{{ user.email }}</span>
+        <a href="{% url 'account_logout' %}">Logout</a>
+      {% else %}
+        <a href="{% url 'account_login' %}">Login</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="wrap">
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

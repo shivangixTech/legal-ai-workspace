@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Legal AI Workspace{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Welcome, {{ user.get_full_name|default:user.email }}! 🙏</h1>
+  <p class="muted">Welcome to your Legal AI Workspace. Manage your cases from here.</p>
+</div>
+<div class="card">
+  <h2>📁 Cases ({{ case_count }}) <a href="{% url 'new_case' %}" class="btn" style="float:right; padding:8px 18px;">➕ New Case</a></h2>
+  {% if cases %}
+  <table>
+    <tr><th>Title</th><th>Organization</th><th>Status</th></tr>
+    {% for c in cases %}
+    <tr><td><a href="{% url 'case_detail' c.pk %}">{{ c.title }}</a></td><td>{{ c.organization.name }}</td><td>{{ c.status }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="muted">No cases yet. Click <strong>➕ New Case</strong> to create your first one.</p>
+  {% endif %}
+</div>
+<div class="card">
+  <h2>🔜 Coming soon</h2>
+  <p class="muted">PDF upload → RAG chat with citations → Research agent</p>
+</div>
+{% endblock %}

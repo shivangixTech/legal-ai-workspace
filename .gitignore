@@ -1,0 +1,13 @@
+# Secrets - NEVER commit
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Django production build output
+staticfiles/
+
+# Local junk
+*.log
+.DS_Store
