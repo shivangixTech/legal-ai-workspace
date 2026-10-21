@@ -105,14 +105,34 @@ def _synthesize(question, sources):
         "summary first.\n\n"
         f"SOURCES:\n{sources_block}\n\nQUESTION: {question}\n\nREPORT:"
     )
-    try:
-        model = genai.GenerativeModel(CHAT_MODEL)
-        resp = model.generate_content(
-            prompt, request_options={"timeout": 60}
-        )
-        report = (resp.text or "").strip()
-    except Exception as exc:
-        raise ResearchError(f"Report generation failed: {exc}")
+    # Gemini's free tier sometimes answers 504 (its own deadline) under
+    # load. That error is transient: wait a few seconds and retry ONCE
+    # before giving up - an unbounded SDK retry loop here is what used
+    # to stall the request until the web worker was killed.
+    import time
+
+    report = ""
+    last_exc = None
+    for attempt in range(2):
+        try:
+            model = genai.GenerativeModel(CHAT_MODEL)
+            resp = model.generate_content(
+                prompt, request_options={"timeout": 60}
+            )
+            report = (resp.text or "").strip()
+            break
+        except Exception as exc:
+            last_exc = exc
+            text = str(exc)
+            transient = (
+                "504" in text or "503" in text or "Deadline" in text
+            )
+            if attempt == 0 and transient:
+                time.sleep(3)
+                continue
+            raise ResearchError(f"Report generation failed: {exc}")
+    if last_exc is not None and not report:
+        raise ResearchError(f"Report generation failed: {last_exc}")
     if not report:
         raise ResearchError("The model did not return a report - please try again.")
     return report
