@@ -127,11 +127,11 @@ def _parse_result(raw):
     start = text.find("{")
     end = text.rfind("}")
     if start == -1 or end == -1 or end <= start:
-        raise ReconcileError("Reconciliation parse nahi ho payi - dobara try karo.")
+        raise ReconcileError("The reconciliation result could not be parsed - please try again.")
     try:
         data = json.loads(text[start : end + 1])
     except json.JSONDecodeError:
-        raise ReconcileError("Reconciliation parse nahi ho payi - dobara try karo.")
+        raise ReconcileError("The reconciliation result could not be parsed - please try again.")
     items = []
     for item in data.get("items", []):
         if not isinstance(item, dict):
@@ -160,8 +160,8 @@ def _parse_result(raw):
         )
     if not items:
         raise ReconcileError(
-            "Bills aur records me compare karne layak items nahi mile - "
-            "check karo ki documents me itemised charges aur services hain."
+            "No comparable items were found in the bills and records - "
+            "please check that the documents contain itemised charges and services."
         )
     summary = {
         "matched": sum(1 for i in items if i["status"] == "matched"),
@@ -184,8 +184,8 @@ def reconcile_case(case_id):
     chunks = _fetch_chunks(case_id)
     if not chunks:
         raise ReconcileError(
-            "Is case me abhi koi indexed document nahi hai - pehle PDF "
-            "upload karo aur 'indexed' status ka wait karo."
+            "This case has no indexed document yet - please upload a PDF "
+            "and wait for its status to become 'indexed'."
         )
     bill_chunks = [c for c in chunks if classify_document(c["document"]) == "bill"]
     record_chunks = [c for c in chunks if classify_document(c["document"]) == "record"]
@@ -193,13 +193,13 @@ def reconcile_case(case_id):
     record_docs = sorted({c["document"] for c in record_chunks})
     if not bill_docs:
         raise ReconcileError(
-            "Koi bill document nahi mila - bill wali PDF ke file name me "
-            "'Bill' ya 'Invoice' hona chahiye (jaise 'Hospital Bill.pdf')."
+            "No bill document found - the bill PDF file name must contain "
+            "'Bill' or 'Invoice' (for example 'Hospital Bill.pdf')."
         )
     if not record_docs:
         raise ReconcileError(
-            "Koi record document nahi mila - bill ke alawa kam se kam ek "
-            "treatment record PDF chahiye."
+            "No record document found - at least one treatment record PDF "
+            "is needed besides the bill."
         )
     try:
         genai = _genai()
@@ -213,7 +213,7 @@ def reconcile_case(case_id):
     except Exception as exc:
         raise ReconcileError(f"Reconciliation failed: {exc}")
     if not raw:
-        raise ReconcileError("Model ne result nahi banaya - dobara try karo.")
+        raise ReconcileError("The model did not return a result - please try again.")
     result = _parse_result(raw)
     result["bill_docs"] = bill_docs
     result["record_docs"] = record_docs

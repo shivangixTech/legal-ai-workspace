@@ -119,13 +119,13 @@ def _parse_events(raw):
     end = text.rfind("]")
     if start == -1 or end == -1 or end <= start:
         raise ChronologyError(
-            "Timeline parse nahi ho payi - dobara try karo."
+            "The timeline could not be parsed - please try again."
         )
     try:
         items = json.loads(text[start : end + 1])
     except json.JSONDecodeError:
         raise ChronologyError(
-            "Timeline parse nahi ho payi - dobara try karo."
+            "The timeline could not be parsed - please try again."
         )
     events = []
     for item in items:
@@ -145,8 +145,8 @@ def _parse_events(raw):
         )
     if not events:
         raise ChronologyError(
-            "Documents me koi timeline events nahi mile - "
-            "pehle check karo ki PDFs me dated content hai."
+            "No timeline events were found in the documents - "
+            "please check that the PDFs contain dated content."
         )
     return events
 
@@ -160,8 +160,8 @@ def build_chronology(case_id):
     chunks = _fetch_chunks(case_id)
     if not chunks:
         raise ChronologyError(
-            "Is case me abhi koi indexed document nahi hai - pehle PDF "
-            "upload karo aur 'indexed' status ka wait karo."
+            "This case has no indexed document yet - please upload a PDF "
+            "and wait for its status to become 'indexed'."
         )
     context = _build_context(chunks)
     genai = _genai()
@@ -172,5 +172,5 @@ def build_chronology(case_id):
     except Exception as exc:
         raise ChronologyError(f"Timeline generation failed: {exc}")
     if not raw:
-        raise ChronologyError("Model ne timeline nahi banayi - dobara try karo.")
+        raise ChronologyError("The model did not return a timeline - please try again.")
     return _parse_events(raw)

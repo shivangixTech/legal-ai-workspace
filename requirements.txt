@@ -33,7 +33,7 @@ celery>=5.4
 redis>=5.0
 
 # --- Utils ---
-requests>=2.0               # allauth google provider ko chahiye
+requests>=2.0               # required by the allauth Google provider
 python-dotenv>=1.0
 
 # --- Production serving (Day 12 - Render) ---

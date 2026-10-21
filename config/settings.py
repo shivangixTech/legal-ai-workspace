@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-    # hamari apps
+    # project apps
     "apps.core",
 ]
 

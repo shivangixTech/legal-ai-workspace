@@ -1,4 +1,4 @@
-"""WSGI config for Legal AI Workspace (production servers ke liye)."""
+"""WSGI config for Legal AI Workspace (for production servers)."""
 import os
 
 from django.core.wsgi import get_wsgi_application

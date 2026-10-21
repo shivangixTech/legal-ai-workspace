@@ -103,7 +103,7 @@ def _synthesize(question, sources):
     except Exception as exc:
         raise ResearchError(f"Report generation failed: {exc}")
     if not report:
-        raise ResearchError("Model ne report nahi banayi — dobara try karo.")
+        raise ResearchError("The model did not return a report - please try again.")
     return report
 
 

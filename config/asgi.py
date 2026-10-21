@@ -1,4 +1,4 @@
-"""ASGI config for Legal AI Workspace (async future ke liye)."""
+"""ASGI config for Legal AI Workspace (for future async use)."""
 import os
 
 from django.core.asgi import get_asgi_application

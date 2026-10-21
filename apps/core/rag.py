@@ -141,8 +141,8 @@ def ask_case(question, case_id, history=None):
     chunks = retrieve_chunks(case_id, question)
     if not chunks:
         raise RagError(
-            "Is case me abhi koi indexed document nahi hai — pehle PDF "
-            "upload karo aur 'indexed' status ka wait karo."
+            "This case has no indexed document yet - please upload a PDF "
+            "and wait for its status to become 'indexed'."
         )
     genai = _genai()
     context_parts = []
@@ -182,6 +182,6 @@ def ask_case(question, case_id, history=None):
     except Exception as exc:
         raise RagError(f"Answer generation failed: {exc}")
     if not answer:
-        raise RagError("Model ne jawab nahi diya — dobara try karo.")
+        raise RagError("The model did not return an answer - please try again.")
     citations = _build_citations(answer, chunks)
     return answer, citations
