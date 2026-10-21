@@ -105,14 +105,18 @@ def _synthesize(question, sources):
         "summary first.\n\n"
         f"SOURCES:\n{sources_block}\n\nQUESTION: {question}\n\nREPORT:"
     )
-    # Gemini's free tier sometimes answers 504 (its own deadline) under
-    # load. That error is transient: wait a few seconds and retry ONCE
-    # before giving up - an unbounded SDK retry loop here is what used
-    # to stall the request until the web worker was killed.
+    # Gemini's free tier allows only 5 generate_content requests per
+    # minute for this model, and answers 429 (with its own "retry in
+    # Ns" instruction) or 504 under load. Both are transient: retry
+    # ONCE, but obey Google's wait on a 429 instead of hammering the
+    # quota. The wait fits the web server's 120s budget because a 429
+    # comes back fast, leaving room to sleep about a minute.
+    import re
     import time
 
     report = ""
     last_exc = None
+    started = time.monotonic()
     for attempt in range(2):
         try:
             model = genai.GenerativeModel(CHAT_MODEL)
@@ -124,10 +128,17 @@ def _synthesize(question, sources):
         except Exception as exc:
             last_exc = exc
             text = str(exc)
-            transient = (
-                "504" in text or "503" in text or "Deadline" in text
-            )
-            if attempt == 0 and transient:
+            if attempt == 1:
+                raise ResearchError(f"Report generation failed: {exc}")
+            if "429" in text:
+                match = re.search(r"retry in (\d+(?:\.\d+)?)s", text)
+                wait = float(match.group(1)) + 3 if match else 62
+                elapsed = time.monotonic() - started
+                if elapsed + wait + 25 > 115:
+                    raise ResearchError(f"Report generation failed: {exc}")
+                time.sleep(wait)
+                continue
+            if "504" in text or "503" in text or "Deadline" in text:
                 time.sleep(3)
                 continue
             raise ResearchError(f"Report generation failed: {exc}")
