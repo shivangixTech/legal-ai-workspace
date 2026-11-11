@@ -6,8 +6,7 @@ case chronology, and a records-vs-bills reconciliation - every AI
 output linked to the exact document and page it came from, so a human
 can verify it in one click.
 
-Built as a college project (an Advotac-style product) and also the
-working prototype of **Shivru AI** - see https://shivru.tech
+The working prototype of **Shivru AI** - see https://shivru.tech
 
 ## Features
 
